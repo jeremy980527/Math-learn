@@ -2,75 +2,67 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MatrixLingo - 講人話的數學</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>矩陣學習網 - MatrixLingo</title>
+    <!-- KaTeX 數學渲染 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
 <body>
-    <!-- 手機版模擬容器 -->
-    <div id="app-container">
+    <!-- 頂部導覽列 (純粹的功能列) -->
+    <header class="top-nav glass-nav">
+        <div class="nav-item">🔥 <span id="streak-text">1</span></div>
+        <div class="nav-item">💎 <span id="gem-text">586</span></div>
+    </header>
+
+    <!-- 視圖 1：S型闖關地圖 -->
+    <main id="view-map" class="view-container active">
+        <div class="unit-banner">
+            <h3>第 1 階段</h3>
+            <h2>認識矩陣：數學家的收納盒</h2>
+        </div>
         
-        <!-- 頂部資訊列 (對齊截圖) -->
-        <header id="top-bar">
-            <div class="stat"><span class="icon">🇺🇸</span></div>
-            <div class="stat"><span class="icon streak-icon">🔥</span> <span id="streak-text">1</span></div>
-            <div class="stat"><span class="icon gem-icon">💎</span> 586</div>
-            <div class="stat"><span class="icon heart-icon">💖</span> 25</div>
-        </header>
+        <!-- 這裡將由 JS 動態生成 S 型關卡 -->
+        <div id="map-path-container"></div>
+    </main>
 
-        <!-- 視圖 1：S型闖關地圖 -->
-        <main id="view-map" class="view active">
-            <div class="unit-header">
-                <h3>第 1 階段，第 1 部分</h3>
-                <h2>認識矩陣：數學家的收納盒</h2>
+    <!-- 視圖 2：教學與測驗區 -->
+    <main id="view-lesson" class="view-container" style="display: none;">
+        <!-- 進度條 -->
+        <div class="progress-header">
+            <button id="close-lesson-btn" class="close-btn">✖</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="lesson-progress-fill"></div>
             </div>
-            <div id="map-path-container">
-                <!-- 節點將由 JS 產生 S 型曲線 -->
-            </div>
-        </main>
+        </div>
 
-        <!-- 視圖 2：講人話教學與測驗區 -->
-        <main id="view-lesson" class="view">
-            <div class="lesson-progress">
-                <div class="progress-bar"><div class="progress-fill" id="lesson-progress-fill"></div></div>
-            </div>
-            
-            <div class="lesson-content-area">
-                <!-- 教學卡片 -->
-                <div id="teaching-card" class="card active">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4762/4762311.png" alt="Teacher" class="mascot">
-                    <h2 id="teach-title">載入中...</h2>
-                    <p id="teach-content" class="human-language">載入中...</p>
-                    <div id="teach-math" class="math-display"></div>
-                </div>
-
-                <!-- 測驗卡片 -->
-                <div id="quiz-card" class="card">
-                    <h2 id="quiz-question">載入中...</h2>
-                    <div id="quiz-math" class="math-display"></div>
-                    <div id="options-container" class="options-grid"></div>
-                </div>
+        <div class="lesson-content">
+            <!-- 教學卡片 (玻璃質感) -->
+            <div id="teaching-card" class="glass-card active">
+                <div class="emoji-mascot">🧑‍🏫</div>
+                <h2 id="teach-title">載入中...</h2>
+                <div id="teach-content" class="human-text"></div>
+                <div id="teach-math" class="math-display"></div>
             </div>
 
-            <!-- 底部動作按鈕區 -->
-            <div class="action-footer">
-                <div id="feedback-msg" class="feedback-msg"></div>
-                <button id="action-btn" class="btn primary-btn">繼續</button>
+            <!-- 測驗卡片 -->
+            <div id="quiz-card" class="glass-card">
+                <h2 id="quiz-question">載入中...</h2>
+                <div id="quiz-math" class="math-display"></div>
+                <div id="options-container" class="options-grid"></div>
             </div>
-        </main>
+        </div>
 
-        <!-- 底部導覽列 (對齊截圖) -->
-        <nav id="bottom-nav">
-            <div class="nav-item active">🏠</div>
-            <div class="nav-item">🛡️</div>
-            <div class="nav-item">👤</div>
-            <div class="nav-item">🛡️</div>
-            <div class="nav-item">💬</div>
-        </nav>
-    </div>
+        <!-- 底部動作區 -->
+        <div class="action-footer glass-footer">
+            <div id="feedback-msg" class="feedback-msg"></div>
+            <button id="action-btn" class="btn primary-btn">繼續</button>
+        </div>
+    </main>
+
 </body>
 </html>
