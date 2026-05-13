@@ -3,49 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MatrixLingo</title>
-    <!-- 引入 KaTeX -->
+    <title>MatrixLingo - 講人話的數學</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-    <!-- 引入自定義 CSS 與 JS -->
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
 <body>
-    <header class="navbar glass">
-        <div class="logo">MatrixLingo</div>
-        <div class="controls">
-            <div class="streak" id="streak-container">
-                🔥 <span id="streak-count">0</span>
+    <!-- 手機版模擬容器 -->
+    <div id="app-container">
+        
+        <!-- 頂部資訊列 (對齊截圖) -->
+        <header id="top-bar">
+            <div class="stat"><span class="icon">🇺🇸</span></div>
+            <div class="stat"><span class="icon streak-icon">🔥</span> <span id="streak-text">1</span></div>
+            <div class="stat"><span class="icon gem-icon">💎</span> 586</div>
+            <div class="stat"><span class="icon heart-icon">💖</span> 25</div>
+        </header>
+
+        <!-- 視圖 1：S型闖關地圖 -->
+        <main id="view-map" class="view active">
+            <div class="unit-header">
+                <h3>第 1 階段，第 1 部分</h3>
+                <h2>認識矩陣：數學家的收納盒</h2>
             </div>
-            <button class="icon-btn" id="theme-toggle">🌓</button>
-        </div>
-    </header>
+            <div id="map-path-container">
+                <!-- 節點將由 JS 產生 S 型曲線 -->
+            </div>
+        </main>
 
-    <main class="container">
-        <!-- 左側單元列表 (Duolingo 風格路徑) -->
-        <aside class="sidebar glass">
-            <h2>學習路徑</h2>
-            <div id="unit-path"></div>
-        </aside>
-
-        <!-- 右側遊戲區域 -->
-        <section class="game-area">
-            <div class="card glass" id="question-card">
-                <div class="unit-badge" id="current-unit-badge">單元 1</div>
-                <h2 id="question-text">載入中...</h2>
-                <div class="math-display" id="math-equation"></div>
-                
-                <div class="options-grid" id="options-container">
-                    <!-- 選項將由 JS 動態生成 -->
+        <!-- 視圖 2：講人話教學與測驗區 -->
+        <main id="view-lesson" class="view">
+            <div class="lesson-progress">
+                <div class="progress-bar"><div class="progress-fill" id="lesson-progress-fill"></div></div>
+            </div>
+            
+            <div class="lesson-content-area">
+                <!-- 教學卡片 -->
+                <div id="teaching-card" class="card active">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4762/4762311.png" alt="Teacher" class="mascot">
+                    <h2 id="teach-title">載入中...</h2>
+                    <p id="teach-content" class="human-language">載入中...</p>
+                    <div id="teach-math" class="math-display"></div>
                 </div>
 
-                <div class="feedback" id="feedback-message"></div>
-                <button class="btn primary-btn" id="submit-btn" disabled>檢查答案</button>
+                <!-- 測驗卡片 -->
+                <div id="quiz-card" class="card">
+                    <h2 id="quiz-question">載入中...</h2>
+                    <div id="quiz-math" class="math-display"></div>
+                    <div id="options-container" class="options-grid"></div>
+                </div>
             </div>
-        </section>
-    </main>
+
+            <!-- 底部動作按鈕區 -->
+            <div class="action-footer">
+                <div id="feedback-msg" class="feedback-msg"></div>
+                <button id="action-btn" class="btn primary-btn">繼續</button>
+            </div>
+        </main>
+
+        <!-- 底部導覽列 (對齊截圖) -->
+        <nav id="bottom-nav">
+            <div class="nav-item active">🏠</div>
+            <div class="nav-item">🛡️</div>
+            <div class="nav-item">👤</div>
+            <div class="nav-item">🛡️</div>
+            <div class="nav-item">💬</div>
+        </nav>
+    </div>
 </body>
 </html>
-
