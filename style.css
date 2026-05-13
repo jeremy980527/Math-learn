@@ -1,86 +1,141 @@
 :root {
     --bg-dark: #131f24;
-    --bg-darker: #0b1416;
     --text-main: #ffffff;
-    --text-muted: #afbac0;
     --primary: #58cc02;
     --primary-shadow: #46a302;
-    --unit-header: #58cc02;
-    --node-locked: #37464f;
-    --node-locked-shadow: #202f36;
-    --card-bg: #202f36;
-    --border-color: #37464f;
-    --correct: #d7ffb8;
-    --correct-bg: #1cb0f6; /* Duolingo correct is sometimes blue/green */
+    --node-locked: #2a3b45;
+    --node-locked-shadow: #1e2a32;
+    --correct-bg: #1cb0f6;
     --wrong-bg: #ff4b4b;
+    --glass-bg: rgba(32, 47, 54, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
 
-body { background-color: #000; display: flex; justify-content: center; height: 100vh; overflow: hidden; color: var(--text-main); }
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    /* 真響應式：依賴原生滾動，解決高度塌陷 */
+    min-height: 100dvh; 
+    display: flex;
+    flex-direction: column;
+}
 
-/* 模擬手機螢幕 */
-#app-container { width: 100%; max-width: 420px; background-color: var(--bg-dark); height: 100%; display: flex; flex-direction: column; position: relative; }
+/* 中央限制寬度 (Desktop & Mobile 相容) */
+.view-container {
+    flex: 1;
+    width: 100%;
+    max-width: 600px; /* 電腦上看不會放到無限大，手機上會自動填滿 */
+    margin: 0 auto;
+    padding: 20px;
+    padding-top: 80px; /* 避開固定導覽列 */
+}
 
-/* 頂部數據列 */
-#top-bar { display: flex; justify-content: space-between; padding: 15px 20px; background-color: var(--bg-dark); z-index: 10; font-weight: bold; }
-.stat { display: flex; align-items: center; gap: 5px; font-size: 1.1rem; }
-.streak-icon { color: #ff9600; } .gem-icon { color: #1cb0f6; } .heart-icon { color: #ff4b4b; }
+/* 頂部導覽列 (固定在最上方) */
+.top-nav {
+    position: fixed; top: 0; left: 0; width: 100%;
+    display: flex; justify-content: center; gap: 30px;
+    padding: 15px; z-index: 100;
+}
+.glass-nav {
+    background: rgba(19, 31, 36, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+}
+.nav-item { font-size: 1.2rem; font-weight: bold; }
 
-/* 視圖切換 */
-.view { flex: 1; overflow-y: auto; display: none; flex-direction: column; }
-.view.active { display: flex; }
+/* 單元標題橫幅 */
+.unit-banner {
+    background-color: var(--primary);
+    color: #0b1416;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 0 var(--primary-shadow);
+}
+.unit-banner h3 { font-size: 0.9rem; margin-bottom: 5px; opacity: 0.9; }
+.unit-banner h2 { font-size: 1.5rem; font-weight: 900; }
 
-/* --- 地圖視圖 --- */
-.unit-header { background-color: var(--unit-header); padding: 20px; border-radius: 15px; margin: 10px; color: #111; box-shadow: 0 4px 0 #46a302; }
-.unit-header h3 { font-size: 0.9rem; opacity: 0.8; margin-bottom: 5px; }
-.unit-header h2 { font-size: 1.4rem; font-weight: 900; }
+/* 地圖路線區 */
+#map-path-container {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 25px; padding-bottom: 60px;
+}
 
-#map-path-container { display: flex; flex-direction: column; align-items: center; padding: 40px 0 100px 0; gap: 30px; position: relative; }
+.node-row {
+    width: 100%; display: flex; justify-content: center;
+}
+/* 圓形關卡按鈕 */
+.node {
+    width: 75px; height: 75px; border-radius: 50%;
+    background: var(--node-locked);
+    box-shadow: 0 8px 0 var(--node-locked-shadow);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 2rem; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
+}
+.node:active { transform: translateY(8px); box-shadow: 0 0 0 transparent; }
+.node.unlocked { background: var(--primary); box-shadow: 0 8px 0 var(--primary-shadow); }
+.node.current { 
+    background: var(--primary); box-shadow: 0 8px 0 var(--primary-shadow); 
+    border: 4px solid #fff; position: relative;
+}
+.node.current::after {
+    content: '⭐'; position: absolute; top: -35px; font-size: 1.8rem;
+    animation: float 1.5s infinite ease-in-out;
+}
 
-/* S型節點 */
-.node-wrapper { display: flex; justify-content: center; width: 100%; position: relative; }
-.node { width: 70px; height: 70px; border-radius: 50%; background: var(--node-locked); box-shadow: 0 6px 0 var(--node-locked-shadow); display: flex; justify-content: center; align-items: center; font-size: 2rem; cursor: pointer; transition: transform 0.1s; }
-.node:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
-.node.unlocked { background: var(--primary); box-shadow: 0 6px 0 var(--primary-shadow); }
-.node.current { background: var(--primary); box-shadow: 0 6px 0 var(--primary-shadow); position: relative; }
-/* 當前關卡的彈跳動畫 */
-.node.current::after { content: '⭐'; position: absolute; top: -30px; font-size: 1.5rem; animation: bounce 1s infinite; }
-
-/* --- 教學與測驗視圖 --- */
-.lesson-progress { padding: 20px; }
-.progress-bar { height: 16px; background: var(--node-locked); border-radius: 8px; overflow: hidden; }
+/* ================== 教學與測驗畫面 ================== */
+.progress-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+.close-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+.progress-bar { flex: 1; height: 16px; background: var(--node-locked); border-radius: 8px; overflow: hidden; }
 .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
 
-.lesson-content-area { flex: 1; padding: 0 20px; display: flex; flex-direction: column; justify-content: center; }
+.lesson-content { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-bottom: 120px;}
 
-.card { display: none; flex-direction: column; align-items: center; text-align: center; background: var(--card-bg); padding: 30px 20px; border-radius: 20px; border: 2px solid var(--border-color); }
-.card.active { display: flex; animation: slideIn 0.3s ease; }
+/* 玻璃擬物化卡片 */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px; padding: 30px 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: none; flex-direction: column; align-items: center; text-align: center;
+}
+.glass-card.active { display: flex; animation: fadeIn 0.4s ease; }
 
-.mascot { width: 80px; margin-bottom: 20px; }
-h2 { font-size: 1.5rem; margin-bottom: 15px; }
-.human-language { font-size: 1.2rem; line-height: 1.6; text-align: left; color: #e5e5e5; }
-.math-display { font-size: 1.6rem; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; width: 100%; overflow-x: auto; }
+.emoji-mascot { font-size: 4rem; margin-bottom: 15px; }
+.human-text { font-size: 1.15rem; line-height: 1.7; text-align: left; color: #e2e8f0; width: 100%; }
+.math-display { font-size: 1.4rem; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 12px; width: 100%; overflow-x: auto; }
 
-/* 選項按鈕 */
+/* 測驗選項 */
 .options-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-.opt-btn { background: var(--bg-darker); border: 2px solid var(--border-color); color: var(--text-main); padding: 15px; border-radius: 15px; font-size: 1.2rem; cursor: pointer; text-align: center; border-bottom: 4px solid var(--border-color); transition: 0.1s; }
+.opt-btn {
+    background: var(--bg-dark); border: 2px solid var(--node-locked); color: var(--text-main);
+    padding: 16px; border-radius: 16px; font-size: 1.2rem; cursor: pointer;
+    border-bottom: 4px solid var(--node-locked); transition: all 0.1s;
+}
 .opt-btn.selected { border-color: #84d8ff; background: rgba(132, 216, 255, 0.1); border-bottom: 4px solid #84d8ff; }
 
 /* 底部操作區 */
-.action-footer { padding: 20px; border-top: 2px solid var(--border-color); background: var(--bg-dark); }
-.btn { width: 100%; padding: 16px; border: none; border-radius: 15px; font-size: 1.2rem; font-weight: bold; cursor: pointer; text-transform: uppercase; color: white; transition: 0.1s; }
-.primary-btn { background: var(--primary); box-shadow: 0 5px 0 var(--primary-shadow); }
-.primary-btn:active { transform: translateY(5px); box-shadow: 0 0 0 transparent; }
-.btn:disabled { background: var(--node-locked); box-shadow: 0 5px 0 var(--node-locked-shadow); color: var(--text-muted); cursor: not-allowed; }
-.feedback-msg { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; display: none; }
+.glass-footer {
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background: rgba(19, 31, 36, 0.85); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--glass-border); padding: 20px;
+    display: flex; flex-direction: column; align-items: center;
+}
+.btn {
+    width: 100%; max-width: 600px; padding: 18px; border: none; border-radius: 16px;
+    font-size: 1.2rem; font-weight: bold; cursor: pointer; color: white; transition: 0.1s;
+}
+.primary-btn { background: var(--primary); box-shadow: 0 6px 0 var(--primary-shadow); }
+.primary-btn:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+.btn:disabled { background: var(--node-locked); box-shadow: 0 6px 0 var(--node-locked-shadow); cursor: not-allowed; color: #888;}
 
-/* 底部導覽列 */
-#bottom-nav { display: flex; justify-content: space-around; padding: 15px 0; background: var(--bg-dark); border-top: 2px solid var(--border-color); z-index: 10; }
-.nav-item { font-size: 1.8rem; filter: grayscale(100%); opacity: 0.5; cursor: pointer; }
-.nav-item.active { filter: grayscale(0%); opacity: 1; }
+.feedback-msg { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; display: none; width: 100%; max-width: 600px; text-align: left; }
 
-@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 .shake { animation: shake 0.4s ease; border-color: var(--wrong-bg); }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } }
