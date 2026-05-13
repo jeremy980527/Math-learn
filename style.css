@@ -1,165 +1,86 @@
 :root {
-    /* 亮色模式變數 */
-    --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-    --glass-bg: rgba(255, 255, 255, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.4);
-    --text-main: #1f2937;
-    --text-muted: #4b5563;
+    --bg-dark: #131f24;
+    --bg-darker: #0b1416;
+    --text-main: #ffffff;
+    --text-muted: #afbac0;
     --primary: #58cc02;
     --primary-shadow: #46a302;
-    --secondary: #e5e7eb;
-    --secondary-shadow: #d1d5db;
+    --unit-header: #58cc02;
+    --node-locked: #37464f;
+    --node-locked-shadow: #202f36;
+    --card-bg: #202f36;
+    --border-color: #37464f;
     --correct: #d7ffb8;
-    --correct-border: #58cc02;
-    --wrong: #ffdfe0;
-    --wrong-border: #ff4b4b;
+    --correct-bg: #1cb0f6; /* Duolingo correct is sometimes blue/green */
+    --wrong-bg: #ff4b4b;
 }
 
-[data-theme="dark"] {
-    /* 暗色模式變數 */
-    --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-    --glass-bg: rgba(17, 24, 39, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --text-main: #f9fafb;
-    --text-muted: #9ca3af;
-    --secondary: #374151;
-    --secondary-shadow: #1f2937;
-    --correct: #14532d;
-    --correct-border: #22c55e;
-    --wrong: #7f1d1d;
-    --wrong-border: #ef4444;
-}
+* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
 
-* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+body { background-color: #000; display: flex; justify-content: center; height: 100vh; overflow: hidden; color: var(--text-main); }
 
-body {
-    margin: 0;
-    min-height: 100vh;
-    background: var(--bg-gradient);
-    color: var(--text-main);
-    transition: background 0.3s, color 0.3s;
-    display: flex;
-    flex-direction: column;
-}
+/* 模擬手機螢幕 */
+#app-container { width: 100%; max-width: 420px; background-color: var(--bg-dark); height: 100%; display: flex; flex-direction: column; position: relative; }
 
-/* 玻璃擬物化共用類別 */
-.glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
+/* 頂部數據列 */
+#top-bar { display: flex; justify-content: space-between; padding: 15px 20px; background-color: var(--bg-dark); z-index: 10; font-weight: bold; }
+.stat { display: flex; align-items: center; gap: 5px; font-size: 1.1rem; }
+.streak-icon { color: #ff9600; } .gem-icon { color: #1cb0f6; } .heart-icon { color: #ff4b4b; }
 
-/* 導覽列 */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-    margin: 20px;
-    border-radius: 20px;
-}
+/* 視圖切換 */
+.view { flex: 1; overflow-y: auto; display: none; flex-direction: column; }
+.view.active { display: flex; }
 
-.logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+/* --- 地圖視圖 --- */
+.unit-header { background-color: var(--unit-header); padding: 20px; border-radius: 15px; margin: 10px; color: #111; box-shadow: 0 4px 0 #46a302; }
+.unit-header h3 { font-size: 0.9rem; opacity: 0.8; margin-bottom: 5px; }
+.unit-header h2 { font-size: 1.4rem; font-weight: 900; }
 
-.controls { display: flex; gap: 15px; align-items: center; }
+#map-path-container { display: flex; flex-direction: column; align-items: center; padding: 40px 0 100px 0; gap: 30px; position: relative; }
 
-.streak {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #ff9600;
-}
+/* S型節點 */
+.node-wrapper { display: flex; justify-content: center; width: 100%; position: relative; }
+.node { width: 70px; height: 70px; border-radius: 50%; background: var(--node-locked); box-shadow: 0 6px 0 var(--node-locked-shadow); display: flex; justify-content: center; align-items: center; font-size: 2rem; cursor: pointer; transition: transform 0.1s; }
+.node:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+.node.unlocked { background: var(--primary); box-shadow: 0 6px 0 var(--primary-shadow); }
+.node.current { background: var(--primary); box-shadow: 0 6px 0 var(--primary-shadow); position: relative; }
+/* 當前關卡的彈跳動畫 */
+.node.current::after { content: '⭐'; position: absolute; top: -30px; font-size: 1.5rem; animation: bounce 1s infinite; }
 
-.icon-btn {
-    background: none; border: none; font-size: 1.5rem; cursor: pointer;
-}
+/* --- 教學與測驗視圖 --- */
+.lesson-progress { padding: 20px; }
+.progress-bar { height: 16px; background: var(--node-locked); border-radius: 8px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
 
-/* 主佈局 */
-.container {
-    display: flex;
-    flex: 1;
-    gap: 30px;
-    padding: 0 20px 20px 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-}
+.lesson-content-area { flex: 1; padding: 0 20px; display: flex; flex-direction: column; justify-content: center; }
 
-.sidebar { width: 300px; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+.card { display: none; flex-direction: column; align-items: center; text-align: center; background: var(--card-bg); padding: 30px 20px; border-radius: 20px; border: 2px solid var(--border-color); }
+.card.active { display: flex; animation: slideIn 0.3s ease; }
 
-.unit-node {
-    padding: 15px;
-    border-radius: 16px;
-    background: var(--secondary);
-    text-align: center;
-    font-weight: bold;
-    cursor: pointer;
-    border-bottom: 4px solid var(--secondary-shadow);
-    transition: transform 0.1s;
-}
-.unit-node.active {
-    background: var(--primary); color: white; border-bottom: 4px solid var(--primary-shadow);
-}
-
-.game-area { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
-
-.card {
-    width: 100%; max-width: 600px; padding: 40px; margin-top: 20px;
-    display: flex; flex-direction: column; align-items: center; text-align: center;
-}
-
-.unit-badge {
-    color: var(--primary); font-weight: bold; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
-}
-
-.math-display { font-size: 1.5rem; margin: 30px 0; min-height: 80px; }
+.mascot { width: 80px; margin-bottom: 20px; }
+h2 { font-size: 1.5rem; margin-bottom: 15px; }
+.human-language { font-size: 1.2rem; line-height: 1.6; text-align: left; color: #e5e5e5; }
+.math-display { font-size: 1.6rem; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; width: 100%; overflow-x: auto; }
 
 /* 選項按鈕 */
-.options-grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; margin-bottom: 30px; }
+.options-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+.opt-btn { background: var(--bg-darker); border: 2px solid var(--border-color); color: var(--text-main); padding: 15px; border-radius: 15px; font-size: 1.2rem; cursor: pointer; text-align: center; border-bottom: 4px solid var(--border-color); transition: 0.1s; }
+.opt-btn.selected { border-color: #84d8ff; background: rgba(132, 216, 255, 0.1); border-bottom: 4px solid #84d8ff; }
 
-.option-btn {
-    background: var(--glass-bg); color: var(--text-main);
-    border: 2px solid var(--glass-border); border-radius: 16px;
-    padding: 20px; font-size: 1.2rem; cursor: pointer;
-    transition: all 0.2s; border-bottom: 4px solid var(--glass-border);
-}
-.option-btn:hover { background: var(--secondary); }
-.option-btn.selected {
-    border-color: #84d8ff; background: rgba(132, 216, 255, 0.1); border-bottom: 4px solid #84d8ff;
-}
+/* 底部操作區 */
+.action-footer { padding: 20px; border-top: 2px solid var(--border-color); background: var(--bg-dark); }
+.btn { width: 100%; padding: 16px; border: none; border-radius: 15px; font-size: 1.2rem; font-weight: bold; cursor: pointer; text-transform: uppercase; color: white; transition: 0.1s; }
+.primary-btn { background: var(--primary); box-shadow: 0 5px 0 var(--primary-shadow); }
+.primary-btn:active { transform: translateY(5px); box-shadow: 0 0 0 transparent; }
+.btn:disabled { background: var(--node-locked); box-shadow: 0 5px 0 var(--node-locked-shadow); color: var(--text-muted); cursor: not-allowed; }
+.feedback-msg { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; display: none; }
 
-/* 主操作按鈕 */
-.btn {
-    width: 100%; padding: 18px; border: none; border-radius: 16px;
-    font-size: 1.2rem; font-weight: bold; cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.1s;
-}
-.primary-btn { background: var(--primary); color: white; box-shadow: 0 5px 0 var(--primary-shadow); }
-.primary-btn:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 0 0 var(--primary-shadow); }
-.primary-btn:disabled { background: var(--secondary); color: var(--text-muted); box-shadow: 0 5px 0 var(--secondary-shadow); cursor: not-allowed; }
+/* 底部導覽列 */
+#bottom-nav { display: flex; justify-content: space-around; padding: 15px 0; background: var(--bg-dark); border-top: 2px solid var(--border-color); z-index: 10; }
+.nav-item { font-size: 1.8rem; filter: grayscale(100%); opacity: 0.5; cursor: pointer; }
+.nav-item.active { filter: grayscale(0%); opacity: 1; }
 
-.feedback { font-weight: bold; margin-bottom: 15px; min-height: 24px; font-size: 1.2rem; }
-.feedback.correct { color: var(--correct-border); animation: pop 0.3s ease; }
-.feedback.wrong { color: var(--wrong-border); }
-
-/* 動畫 */
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    50% { transform: translateX(10px); }
-    75% { transform: translateX(-10px); }
-}
-.shake { animation: shake 0.4s ease-in-out; border-color: var(--wrong-border); }
-@keyframes pop {
-    0% { transform: scale(0.9); opacity: 0; }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); opacity: 1; }
-}
-@keyframes pulse-fire {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); text-shadow: 0 0 10px #ff9600; }
-    100% { transform: scale(1); }
-}
-.fire-anim { animation: pulse-fire 0.5s ease; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } }
+.shake { animation: shake 0.4s ease; border-color: var(--wrong-bg); }
